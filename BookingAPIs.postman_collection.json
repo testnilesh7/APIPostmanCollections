@@ -1,0 +1,304 @@
+{
+	"info": {
+		"_postman_id": "1aaf4be8-faa3-4cc4-be7d-44b47255710f",
+		"name": "BookingAPIs",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "25676939"
+	},
+	"item": [
+		{
+			"name": "1-CreateToken",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"\r",
+							"//const res=pm.response.json();\r",
+							"//const tokenID=res.token;\r",
+							"//console.log(\"Print Token ==> \" + tokenID)\r",
+							"\r",
+							"//pm.variables.set(\"TokenID\",tokenID);"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"username\" : \"{{username}}\",\n    \"password\" : \"{{password}}\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseURL}}/auth",
+					"host": [
+						"{{baseURL}}"
+					],
+					"path": [
+						"auth"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "2-GetAllBookings",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseURL}}/booking",
+					"host": [
+						"{{baseURL}}"
+					],
+					"path": [
+						"booking"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "3-CreateABooking",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"const bookingID=pm.response.json().bookingid;\r",
+							"console.log(\"Print booking ID ==> \" + bookingID);\r",
+							"\r",
+							"pm.variables.set(\"booking_id\",bookingID);"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"firstname\" : \"Jim\",\n    \"lastname\" : \"Brown\",\n    \"totalprice\" : 111,\n    \"depositpaid\" : true,\n    \"bookingdates\" : {\n        \"checkin\" : \"2018-01-01\",\n        \"checkout\" : \"2019-01-01\"\n    },\n    \"additionalneeds\" : \"Breakfast\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseURL}}/booking",
+					"host": [
+						"{{baseURL}}"
+					],
+					"path": [
+						"booking"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "4-GetBookingByID",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"// Assignment\r",
+							"//callthe post api to create a booking using the script\r",
+							"//and fetch the booking and store in variable.\r",
+							"\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseURL}}/booking/{{booking_id}}",
+					"host": [
+						"{{baseURL}}"
+					],
+					"path": [
+						"booking",
+						"{{booking_id}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "5-UpdateABookingByID",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"// genrate a token using auth API and fetch the token\r",
+							"\r",
+							"pm.sendRequest({\r",
+							"            method: 'POST',\r",
+							"            url: pm.environment.get(\"baseURL\") +'/auth',\r",
+							"            header:{\r",
+							"                'Content-Type' : 'application/json'\r",
+							"            },\r",
+							"            body:{\r",
+							"                mode: 'raw',\r",
+							"                // javascript onject to json\r",
+							"                raw: JSON.stringify({\r",
+							"                    \"username\": pm.environment.get(\"username\"),\r",
+							"                    \"password\":pm.environment.get(\"password\")\r",
+							"                })\r",
+							"            }\r",
+							"\r",
+							"},function(error,response){\r",
+							"    if(error){\r",
+							"        console.log(error)\r",
+							"    }else{\r",
+							"        // JSON to JS Object\r",
+							"       const responseBody= JSON.parse(response.text());\r",
+							"       const tokenID=responseBody.token;\r",
+							"       console.log(\"New Token Id IS ==> +\",tokenID);\r",
+							"       pm.variables.set(\"newTokenID\",tokenID);\r",
+							"       \r",
+							"    }\r",
+							"\r",
+							"})"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					},
+					{
+						"key": "Accept",
+						"value": "application/json"
+					},
+					{
+						"key": "Cookie",
+						"value": "token={{newTokenID}}"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"firstname\" : \"Nilesh\",\n    \"lastname\" : \"Bhujang\",\n    \"totalprice\" : 111,\n    \"depositpaid\" : true,\n    \"bookingdates\" : {\n        \"checkin\" : \"2025-01-01\",\n        \"checkout\" : \"2025-02-27\"\n    },\n    \"additionalneeds\" : \"Breakfast\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseURL}}/booking/{{booking_id}}",
+					"host": [
+						"{{baseURL}}"
+					],
+					"path": [
+						"booking",
+						"{{booking_id}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "6-DeleteABookingByID",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"// genrate a token using auth API and fetch the token\r",
+							"\r",
+							"pm.sendRequest({\r",
+							"            method: 'POST',\r",
+							"            url: pm.environment.get(\"baseURL\") +'/auth',\r",
+							"            header:{\r",
+							"                'Content-Type' : 'application/json'\r",
+							"            },\r",
+							"            body:{\r",
+							"                mode: 'raw',\r",
+							"                // javascript onject to json\r",
+							"                raw: JSON.stringify({\r",
+							"                    \"username\": pm.environment.get(\"username\"),\r",
+							"                    \"password\":pm.environment.get(\"password\")\r",
+							"                })\r",
+							"            }\r",
+							"\r",
+							"},function(error,response){\r",
+							"    if(error){\r",
+							"        console.log(error)\r",
+							"    }else{\r",
+							"        // JSON to JS Object\r",
+							"       const responseBody= JSON.parse(response.text());\r",
+							"       const tokenID=responseBody.token;\r",
+							"       console.log(\"New Token Id IS ==> +\",tokenID);\r",
+							"       pm.variables.set(\"newTokenID\",tokenID);\r",
+							"       \r",
+							"    }\r",
+							"\r",
+							"})"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					},
+					{
+						"key": "Cookie",
+						"value": "token={{newTokenID}}"
+					}
+				],
+				"url": {
+					"raw": "{{baseURL}}/booking/{{booking_id}}",
+					"host": [
+						"{{baseURL}}"
+					],
+					"path": [
+						"booking",
+						"{{booking_id}}"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
